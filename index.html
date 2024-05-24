@@ -1,0 +1,171 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Ecommerce Website</title>
+    <style>
+        .product {
+            border: 1px solid gray;
+            margin: 10px;
+            padding: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease-in-out;
+            width: 200px;
+        }
+        .product:hover {
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+        }
+        .product img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+        }
+        #products {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-around;
+        }
+        body {
+            font-family: Arial, sans-serif;
+        }
+        header {
+            background-color: #f8f8f8;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        header h1 {
+            margin: 0;
+        }
+        header a {
+            text-decoration: none;
+            color: black;
+            margin-left: 20px;
+        }
+        header a {
+    text-decoration: none;
+    color: black;
+    margin-left: 20px;
+    padding: 8px 16px; 
+    border: 1px solid #bbb; 
+    border-radius: 5px;
+    background-color: #f8f8f8; 
+}
+
+header a:hover {
+    background-color: #ddd; /* Change background color on hover */
+}
+        .add-to-cart {
+            background-color: #f8f8f8;
+            border: none;
+            padding: 10px 15px;
+            color: black;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+        .add-to-cart:hover {
+            background-color: #bbb;
+        }
+    </style>
+    <script>
+        window.onload = function() {
+            fetch('http://127.0.0.1:600/')
+            .then(response => response.json())
+            .then(data => {
+                let productsContainer = document.getElementById('products');
+                data.forEach(product => {
+                    let productDiv = document.createElement('div');
+                    productDiv.className = 'product';
+                                        
+                    productDiv.innerHTML = `
+                        <img src="Image.png">
+                        <h2>${product.product_name}</h2>
+                        <p>Description: ${product.description}</p>
+                        <p>Category: ${product.category}</p>
+                        <p>Price: $${product.price}</p>
+                        <p>Discount: ${product.discount}%</p>
+                        <button class="add-to-cart" onclick="addToCart('${product.product_id}')">Add to cart</button>`;
+                    productsContainer.appendChild(productDiv);
+                });
+            });
+        }
+
+        function addToCart(product_id) {
+            // Get user_id from document.cookie
+            const cookies = document.cookie.split(';');
+            let user_id = '';
+            cookies.forEach(cookie => {
+                const [name, value] = cookie.trim().split('=');
+                if (name === 'user_id') {
+                    user_id = value;
+                }
+            });
+
+            // Prepare data for POST request
+            const data = {
+                user_id: user_id,
+                product_id: product_id,
+                quantity: 1
+            };
+
+            // Make POST request to your API
+            fetch('http://127.0.0.1:800/add_cart', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.log('Added to cart:', data);
+                // You can handle success response here
+            })
+            .catch(error => {
+                console.error('Error adding to cart:', error);
+                // You can handle error here
+            });
+        }
+        // log out
+        // Function to clear cookies
+        function clearCookies() {
+        const cookies = document.cookie.split(';');
+        cookies.forEach(cookie => {
+            const [name, _] = cookie.trim().split('=');
+            document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
+        });
+    }
+
+    // Function to redirect to login page
+    function redirectToLogin() {
+        window.location.href = "/login.html";
+    }
+
+        document.getElementById('logoutBtn').addEventListener('click', function() {
+            clearCookies(); // Clear cookies
+            redirectToLogin(); // Redirect to login page
+        });
+    </script>
+</head>
+<body>
+    <header>
+        <h1>Ecommerce Website</h1>
+        <div>
+            <a href="orders.html">Orders</a>
+            <a href="cart.html">Cart</a>
+            <a href="login.html">Logout</a>
+        </div>
+    </header>
+    
+    <h1 style="text-align: center;">Our Products</h1>
+    <div id="products"></div>
+    
+
+</body>
+</html>
